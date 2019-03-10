@@ -365,6 +365,7 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 #define PLAY_PIN 10
+
 int MODE = 1; // 0 is playmode / 1 sequencer mode
 
 void setup() {
@@ -400,15 +401,20 @@ void setup() {
   pinMode(16,OUTPUT); 
   pinMode(17,OUTPUT); 
   
-  //8-bit PWM DAC pin
-  pinMode(11,OUTPUT);
+  //8-bit PWM DAC pin - 10 for mega, 11 for nano
+  pinMode(10,OUTPUT);
 
+
+/* -------------------------------------------------------------------*/
+
+  // exact same code for mega and nano, just OC2A is a different pin (see above)
   // Set up Timer 1 to send a sample every interrupt.
   cli();
   // Set CTC mode
   // Have to set OCR1A *after*, otherwise it gets reset to 0!
   TCCR1B = (TCCR1B & ~_BV(WGM13)) | _BV(WGM12);
-  TCCR1A = TCCR1A & ~(_BV(WGM11) | _BV(WGM10));    
+  TCCR1A = TCCR1A & ~(_BV(WGM11) | _BV(WGM10)); 
+
   // No prescaler
   TCCR1B = (TCCR1B & ~(_BV(CS12) | _BV(CS11))) | _BV(CS10);
   // Set the compare register (OCR1A).
@@ -419,6 +425,7 @@ void setup() {
   TIMSK1 |= _BV(OCIE1A);   
   sei();
   OCR1A = 800; //40KHz Samplefreq
+
 
 // Set up Timer 2 to do pulse width modulation on D11
 
@@ -461,6 +468,7 @@ void setup() {
   ADMUX = 64; 
   sbi(ADCSRA, ADSC);
 
+/* -------------------------------------------------------------------*/
 
   // pin change interrupts
   // https://thewanderingengineer.com/2014/08/11/arduino-pin-change-interrupts/
@@ -470,7 +478,15 @@ void setup() {
   PCMSK2 |= 0b00100000;  // turn on pin PCINT20 digital D5
   
   Serial.begin(38400);
-  Serial.print("setup done");
+  Serial.println("setup done");
+  Serial.print("TCCR0A "); Serial.println(TCCR0A, BIN);
+  Serial.print("TCCR0B "); Serial.println(TCCR0B, BIN);
+  Serial.print("TCCR1A "); Serial.println(TCCR1A, BIN);
+  Serial.print("TCCR1B "); Serial.println(TCCR1B, BIN);
+  Serial.print("TCCR2A "); Serial.println(TCCR2A, BIN);
+  Serial.print("TCCR2B "); Serial.println(TCCR2B, BIN);
+  Serial.print("TIMSK1 "); Serial.println(TIMSK1, BIN);
+
            
 }
 
