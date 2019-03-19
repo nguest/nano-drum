@@ -3,7 +3,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-#include "wavetables.c"
+#include "drumtables.c"
 
 
 
@@ -47,307 +47,30 @@ volatile uint16_t SFREQ;
 /*
 16 steps
 ------------
-Hard rock
-Disco
-Reggae
-Rock
-Samba
-Rumba
-Cha-Cha
-Swing
-Bossa Nova
-Beguine
-Synthpop
 
-12-steps
----------
-Boogie
-Waltz
-Jazz rock
-Slow rock
-Oxygen
 
  */
 
-const unsigned char patternLengths[16] PROGMEM = {15,15,15,15,15,15,15,15,15,15,15,11,11,11,11,11};
+const unsigned char patternLengths[1] PROGMEM = { 15 };
 
-const unsigned char pattern[256] PROGMEM = {
-B00101100,      //Hard rock16
-B00000000,
-B00000100,
-B00000000,
-B00101110,
-B00000000,
-B00100100,
-B00000000,
-B00101100,
-B00000000,
-B00000100,
-B00000000,
-B00101110,
-B00000000,
-B00000100,
-B00000000,
-
-B00100100,      //Disco16
-B00000000,
-B00000100,
-B00010100,
-B00100110,
-B00000000,
-B00000001,
-B00000100,
-B00100100,
-B00000000,
-B00000100,
-B00000100,
-B01100110,
-B00000100,
-B01000001,
-B00000000,
-
-B01000001,      //Reegae16
-B00000100,
-B10000000,
-B00000000,
-B00010110,
-B00000000,
-B10010000,
-B00000000,
-B00100000,
-B00000000,
-B10010000,
-B00000000,
-B00000110,
-B00000000,
-B10000100,
-B00000000,
-
-B00100100,      //Rock16
-B00000000,
-B00000100,
-B00000000,
-B00000110,
-B00000000,
-B00100100,
-B00000000,
-B00100100,
-B00000000,
-B00000100,
-B00000000,
-B00000110,
-B00000000,
-B00000110,
-B00000000,
-  
-B10110101,      //Samba16
-B00010100,
-B10000100,
-B00010100,
-B10110100,
-B00000100,
-B01000100,
-B10010100,
-B00100100,
-B10010100,
-B01000100,
-B10010100,
-B10110101,
-B00000100,
-B10010100,
-B00000100,
-
-B00100110,      //Rumba16
-B00000100,
-B00000001,
-B00110100,
-B00100100,
-B00000001,
-B00010110,
-B00000100,
-B00100100,
-B00000100,
-B00010001,
-B00100100,
-B00110100,
-B00000100,
-B01000001,
-B00000100,
-
-B00100100,      //Cha-Cha16
-B00000000,
-B00000000,
-B00000000,
-B00000110,
+const unsigned char pattern[16] PROGMEM = {
+   //Test
+B01000000,
 B00000000,
 B01000000,
 B00000000,
-B00100100,
-B00000000,
-B00000010,
-B00000000,
-B01000101,
-B00000000,
-B00000010,
-B00000000,
-
-B00100100,      //Swing16
-B00000000,
-B00000000,
-B00000000,
-B00000100,
-B00000000,
-B00000000,
-B00000100,
-B00000100,
-B00000000,
-B00000000,
-B00000000,
-B00000100,
-B00000000,
-B00000000,
-B00000100,
-
-B00100001,      //Bossa Nova16
-B00000100,
-B00000100,
-B00100100,
-B00100001,
-B00000100,
-B01000100,
-B00000100,
-B00100001,
-B00000100,
-B00000100,
 B00100000,
-B00100001,
-B01000101,
-B00000100,
-B00000100,
-
-B00100110,      //Beguine16
+B00000000,
+B00100000,
 B00000000,
 B00000001,
 B00000000,
-B00000100,
-B00000000,
-B01100110,
-B00000000,
-B00100100,
-B00000000,
-B01000100,
-B00000100,
-B00100110,
-B00000000,
-B00000100,
-B00000000,
-
-B10100000,      //Synthpop16
-B00000000,
-B10100010,
-B00000000,
-B00100000,
-B00000000,
-B00100110,
-B00000100,
-B01100000,
-B00000000,
-B01100110,
-B00000100,
-B00100000,
-B00000000,
-B00100010,
-B10001000,
-
-B00100000,    //Boogie12
-B00000000,
-B00100100,
-B00000110,
-B00000000,
-B00100100,
-B00100100,
-B00000000,
-B00100100,
-B00000110,
-B00000000,
-B00100100,
-
-B00000000,
-B00000000,
-B00000000,
-B00000000,
-
-B00100100,      //Waltz12
-B00000000,
-B00000000,
-B00000000,
-B00010010,
-B00000000,
-B00000000,
-B00000000,
-B00010010,
-B00000000,
-B00000000,
-B00000000,
-
-B00000000,
-B00000000,
-B00000000,
-B00000000,
-
-B00100110,      //Jazz rock12
-B00000000,
-B00000100,
-B00000000,
-B00000110,
-B00000000,
-B00000100,
-B00000000,
-B00000110,
-B00000000,
-B01100000,
-B00000000,
-
-B00000000,
-B00000000,
-B00000000,
-B00000000,
-
-B00100100,    //Slow rock12
-B00000000,
-B00000100,
-B00000000,
-B00000100,
-B00000000,
-B00000110,
-B00000000,
-B00000100,
-B00000000,
-B00100100,
-B00000000,
-
-B00000000,
-B00000000,
-B00000000,
-B00000000,
-
-B00100101,    //Oxygen12
-B00001100,
-B00000100,
-B00101110,
-B00000100,
-B00010100,
-B00100101,
-B00000100,
-B00000100,
-B00101100,
-B00000100,
-B11100100,
-B00000000,
-B00000000,
-B00000000,
-B00000000
-
+B00000001,
+B00000001,
+B00000001,
+B00000001,
+B00000001,
+B00000001,
 };
 
 
@@ -529,7 +252,6 @@ ISR(PCINT2_vect) {
 
 
 void loop() {
-  
   samplecntBD=0;
   samplecntBG2=0;
   samplecntCL=0;
@@ -547,47 +269,49 @@ void loop() {
   uint16_t tempocnt = 1;
   uint8_t MUX = 4;
 
-  uint8_t patselect = 1;
+  uint8_t patselect = 0;
   uint8_t patlength = pgm_read_byte_near(patternLengths + patselect);
   
   while(1) { 
+    
 
     //------ Add current sample word to ringbuffer FIFO --------------------  
         
     if (RingCount < 255) {  //if space in ringbuffer
       total = 0;
       if (samplecntBD) {
-        total += (pgm_read_byte_near(BD + samplepntBD++)-128);
+        total += (pgm_read_byte_near(kick + samplepntBD++)-128);
         samplecntBD--;
       }
       if (samplecntBG2) {
-        total += (pgm_read_byte_near(BG2 + samplepntBG2++)-128);
+        total += (pgm_read_byte_near(snare1 + samplepntBG2++)-128);
         samplecntBG2--;
       }
       if (samplecntCL) {
-        total+=(pgm_read_byte_near(CL + samplepntCL++)-128);
+        total+=(pgm_read_byte_near(snare2 + samplepntCL++)-128);
         samplecntCL--;
       }
       if (samplecntCW) {
-        total+=(pgm_read_byte_near(CW + samplepntCW++)-128);
+        total+=(pgm_read_byte_near(rim + samplepntCW++)-128);
         samplecntCW--;
       }
       if (samplecntCY) {
-        total+=(pgm_read_byte_near(CY + samplepntCY++)-128);
+        total+=(pgm_read_byte_near(hat1 + samplepntCY++)-128);
         samplecntCY--;
       }
       if (samplecntGU) {
-        total+=(pgm_read_byte_near(GU + samplepntGU++)-128);
+        total+=(pgm_read_byte_near(hat2 + samplepntGU++)-128);
         samplecntGU--;
       }
        if (samplecntMA) {
-        total+=(pgm_read_byte_near(MA + samplepntMA++)-128);
+        total+=(pgm_read_byte_near(hat3 + samplepntMA++)-128);
         samplecntMA--;
       }
-      if (samplecntQU) {
-        total+=(pgm_read_byte_near(QU + samplepntQU++)-128);
-        samplecntQU--;
-      }
+//      if (samplecntQU) {
+//        total+=(pgm_read_byte_near(QU + samplepntQU++)-128);
+//        samplecntQU--;
+//      }
+      // hard clip
       if (total < -127) total = -127;
       if (total > 127) total = 127;                           
       cli();
@@ -620,37 +344,37 @@ void loop() {
 
           // read the pattern bytes, each one triggers a sample
           if (trig & 1) {
-            samplepntQU = 0;
-            samplecntQU = 7712; // number of bytes in sample
+            samplepntBD = 0;
+            samplecntBD = sizeof(kick); // number of bytes in sample
           }
           if (trig & 2) {
             samplepntCY=0;
-            samplecntCY=9434;
+            samplecntCY= sizeof(snare1);
           }
           if (trig & 4) {
             samplepntMA = 0;
-            samplecntMA = 568;
+            samplecntMA = sizeof(snare2);
           }
           if (trig & 8) {
             samplepntCW = 0;
-            samplecntCW = 830;
+            samplecntCW = sizeof(rim);
           }
           if (trig & 16) {
             samplepntCL = 0;
-            samplecntCL = 752;
+            samplecntCL = sizeof(hat1);
           }
-          if (trig & 32) {
-            samplepntBD = 0;
-            samplecntBD = 1076;
-          }
+//          if (trig & 32) {
+//            samplepntBD = 0;
+//            samplecntBD = sizeof(hat2);
+//          }
           if (trig & 64) {
             samplepntBG2 = 0;
-            samplecntBG2 = 1136;
+            samplecntBG2 = sizeof(hat3);
           }
-          if (trig & 128) {
-            samplepntGU = 0;
-            samplecntGU = 2816;
-          }
+//          if (trig & 128) {
+//            samplepntGU = 0;
+//            samplecntGU = sizeof(GU);
+//          }
         }
         digitalWriteFast(13,LOW); //Clock out Lo
       }
